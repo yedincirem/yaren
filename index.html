@@ -19,18 +19,14 @@ body {
     font-family: 'Press Start 2P', cursive;
     color: white;
     min-height: 100vh;
-    overflow: hidden; /* Başlangıçta ekranı kilitle (kaydırma yok) */
-}
-
-body.content-active {
-    overflow-y: auto; /* Tıklanınca kaydırmayı aç */
+    overflow-y: auto; /* Telefon ve masaüstü için kaydırma açık */
     overflow-x: hidden;
 }
 
 /* Arka plan parlaklığı */
 body::before {
     content: "";
-    position: fixed; /* İçerik kaysa da parlaklık sabit kalsın */
+    position: fixed;
     width: 300px;
     height: 300px;
     background: #ffc1e3;
@@ -43,27 +39,13 @@ body::before {
     pointer-events: none;
 }
 
-/* Başlangıçta tam ortada duran container */
+/* Container */
 .container {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100%;
-    max-width: 600px;
-    padding: 20px;
-    text-align: center;
-    z-index: 2;
-}
-
-/* SİHİR BURADA: Yazılar açıldıktan sonra container doğal akışa geçer, böylece üstten kesilmez */
-body.content-active .container {
     position: relative;
-    top: 0;
-    left: 0;
-    transform: none;
     margin: 0 auto;
     padding: 50px 20px;
+    text-align: center;
+    z-index: 2;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -126,7 +108,6 @@ button:hover {
     pointer-events: none;
 }
 
-/* KUSURSUZ PIXEL HEART */
 .pixel-heart {
     background: transparent;
     box-shadow:
@@ -138,7 +119,6 @@ button:hover {
         18px 30px #ff85c1, 24px 30px #ff85c1;
 }
 
-/* KUSURSUZ PIXEL LILY */
 .lily {
     background: #ffeb3b; 
     box-shadow:
@@ -157,12 +137,29 @@ button:hover {
     100% { transform: translateY(-15vh) scale(1.1); opacity: 0; }
 }
 
-/* fade class */
 .fade {
     opacity: 0 !important;
     transform: scale(0.8) !important;
     transition: 0.5s;
     pointer-events: none;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    #message {
+        font-size: 9px;
+        line-height: 1.8;
+    }
+
+    #photo {
+        width: 90%;
+        margin-top: 20px;
+    }
+
+    button {
+        font-size: 12px;
+        padding: 12px 20px;
+    }
 }
 </style>
 </head>
@@ -176,7 +173,6 @@ button:hover {
 </div>
 
 <script>
-/* Arka plan öğeleri */
 function createBackgroundElements() {
     for(let i=0; i<15; i++){
         let h = document.createElement("div");
@@ -229,20 +225,15 @@ function start(){
         btn.style.display = "none";
         msg.style.display = "block";
         photo.style.display = "block";
-        
-        // Ekran kilidini açıp yukarıdan aşağıya doğru normal akışı başlatıyoruz
-        document.body.classList.add("content-active");
+        msg.textContent = text; // mesajı ekliyoruz
 
         setTimeout(() => {
             msg.style.opacity = "1";
-            
             setTimeout(() => {
                 photo.style.opacity = "1";
                 photo.style.transform = "scale(1)";
             }, 1000);
-            
-        }, 100); 
-
+        }, 100);
     }, 500);
 }
 </script>
