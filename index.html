@@ -15,30 +15,22 @@
 }
 
 body {
-    height: 100dvh; /* Dinamik yükseklik */
     background: black;
     font-family: 'Press Start 2P', cursive;
     color: white;
-    /* Başlangıçta butonu ortalamak için Flex */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /* BAŞLANGIÇTA KİLİTLİ (Kaydırma yok) */
-    overflow: hidden; 
-    transition: background 0.5s;
+    min-height: 100vh;
+    overflow: hidden; /* Başlangıçta ekranı kilitle (kaydırma yok) */
 }
 
-/* YAZI GÖRÜNÜNCE EKRAN KİLİDİNİ AÇAN SINIF (JS ile eklenecek) */
 body.content-active {
-    overflow-y: auto; /* Kaydırmaya izin ver */
-    align-items: flex-start; /* İçeriği yukarıdan başlat */
-    padding: 60px 0; /* Üstten ve alttan boşluk bırak */
+    overflow-y: auto; /* Tıklanınca kaydırmayı aç */
+    overflow-x: hidden;
 }
 
-/* glow */
+/* Arka plan parlaklığı */
 body::before {
     content: "";
-    position: fixed; /* Arka planda sabit kalsın */
+    position: fixed; /* İçerik kaysa da parlaklık sabit kalsın */
     width: 300px;
     height: 300px;
     background: #ffc1e3;
@@ -51,22 +43,30 @@ body::before {
     pointer-events: none;
 }
 
-/* container */
+/* Başlangıçta tam ortada duran container */
 .container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    max-width: 600px;
+    padding: 20px;
+    text-align: center;
+    z-index: 2;
+}
+
+/* SİHİR BURADA: Yazılar açıldıktan sonra container doğal akışa geçer, böylece üstten kesilmez */
+body.content-active .container {
+    position: relative;
+    top: 0;
+    left: 0;
+    transform: none;
+    margin: 0 auto;
+    padding: 50px 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    width: 100%;
-    max-width: 600px; /* PC'de çok yayılmasın */
-    padding: 0 20px;
-    z-index: 2;
-    position: relative;
-}
-
-/* content-active olduğunda container düzeni */
-body.content-active .container {
-    justify-content: flex-start;
 }
 
 /* button */
@@ -79,7 +79,6 @@ button {
     font-size: 14px;
     font-family: inherit;
     transition: 0.3s;
-    /* Butonun her zaman görünmesi için */
     position: relative;
     z-index: 3;
 }
@@ -92,35 +91,34 @@ button:hover {
 
 /* text */
 #message {
-    margin-top: 20px;
-    font-size: 11px; /* Mobilde daha iyi sığması için biraz küçültüldü */
-    line-height: 2.2; /* Okunabilirlik için satır arası açıldı */
+    margin-top: 10px;
+    font-size: 11px;
+    line-height: 2.2;
     opacity: 0;
     transition: 1.5s;
     white-space: pre-line;
     text-shadow: 2px 2px 0px #000;
-    text-align: center;
     width: 100%;
-    display: none; /* Başlangıçta yer kaplamasın */
+    display: none;
 }
 
 /* photo */
 #photo {
     margin-top: 40px;
-    width: 280px; /* Mobilde daha güvenli bir genişlik */
-    max-width: 85vw; /* Ekrandan taşmayı garantili engelle */
+    width: 280px;
+    max-width: 85vw;
     border: 4px solid #ffc1e3;
     opacity: 0;
     transform: scale(0.8);
     transition: 1.5s;
     image-rendering: pixelated;
-    display: none; /* Başlangıçta yer kaplamasın */
-    margin-bottom: 20px; /* En altta boşluk */
+    display: none;
+    margin-bottom: 20px;
 }
 
-/* ARKA PLAN ANİMASYONLARI (Fixed yaparak içerikten ayırdık) */
+/* ARKA PLAN ANİMASYONLARI */
 .pixel-heart, .lily {
-    position: fixed; /* İçerik kaydıkça bunlar ekranda kalsın */
+    position: fixed;
     width: 6px;
     height: 6px;
     animation: rise linear infinite;
@@ -178,7 +176,7 @@ button:hover {
 </div>
 
 <script>
-/* Arka plan öğelerini oluştur (Aynen kaldı) */
+/* Arka plan öğeleri */
 function createBackgroundElements() {
     for(let i=0; i<15; i++){
         let h = document.createElement("div");
@@ -214,7 +212,7 @@ birlikte yasayalım istiyorum.
 her şeyi birlikte yapalım istiyorum.
 seni çok seviyorum.
 çok çok çok çok seviyorum.
-güzel askım, akıllı askım, zeki askım,
+güzel askım, akıllı aşkım, zeki askım,
 gotik askım, bakımlı askım, sapsal askım.
 senden once ben yasamiyormusum ve ciddiyim.
 bazen inanmasan da bana ben seni cidden cok seviyorum
@@ -225,23 +223,19 @@ function start(){
     let msg = document.getElementById("message");
     let photo = document.getElementById("photo");
 
-    // 1. Butonu soldur
     btn.classList.add("fade");
 
     setTimeout(() => {
-        // 2. Butonu tamamen kaldır, içerik alanlarını hazırla
         btn.style.display = "none";
         msg.style.display = "block";
         photo.style.display = "block";
         
-        // 3. KRİTİK ADIM: Body'e scroll izni veren sınıfı ekle
+        // Ekran kilidini açıp yukarıdan aşağıya doğru normal akışı başlatıyoruz
         document.body.classList.add("content-active");
 
-        // 4. Yazıyı belirsizleştir
         setTimeout(() => {
             msg.style.opacity = "1";
             
-            // 5. Fotoğrafı belirsizleştir
             setTimeout(() => {
                 photo.style.opacity = "1";
                 photo.style.transform = "scale(1)";
